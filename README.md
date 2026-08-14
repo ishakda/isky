@@ -1,17 +1,80 @@
 <div align="center">
 
-<h1>kimi-k3-in-c</h1>
+<h1>isky</h1>
+
+<h3>A production-grade autonomous AI agent runtime, in portable C.</h3>
+
+<p>Goals in, verified work out. Planning, tools, memory, and self-correction<br>
+around a CPU-only LLM &mdash; no Python runtime, no framework, no GPU.</p>
+
+<p>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square" alt="License"></a>
+<a href="CMakeLists.txt"><img src="https://img.shields.io/badge/C99-portable-lightgrey?style=flat-square" alt="C99"></a>
+<a href="docs/agent/"><img src="https://img.shields.io/badge/docs-agent-blue?style=flat-square" alt="Docs"></a>
+<a href="#autonomous-agent-layer-isky"><img src="https://img.shields.io/badge/tests-21%20passing-brightgreen?style=flat-square" alt="Tests"></a>
+<img src="https://img.shields.io/badge/version-0.1.0-brightgreen?style=flat-square" alt="Version">
+</p>
+
+<p><b>The model proposes actions; the runtime decides what is valid, permitted, and
+safe &mdash; then executes and verifies it.</b></p>
+
+<table>
+<tr>
+<td align="center"><b>14</b><br><sub>built-in tools</sub></td>
+<td align="center"><b>4</b><br><sub>memory types</sub></td>
+<td align="center"><b>5</b><br><sub>security levels</sub></td>
+<td align="center"><b>SQLite</b><br><sub>crash-safe state</sub></td>
+<td align="center"><b>0</b><br><sub>GPUs / Python</sub></td>
+</tr>
+</table>
+
+</div>
+
+isky is an autonomous agent: give it a goal and it decomposes it into verifiable steps,
+selects and runs tools (files, shell, code, git, web), inspects the results, recovers
+from failures, keeps short- and long-term memory, and only reports success once the work
+is **verified**. It never claims an action happened unless a tool actually performed it.
+
+```bash
+# build (SQLite is fetched automatically at configure time)
+cmake -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j
+ctest --test-dir build                      # 21 tests, no model weights needed
+
+# run a goal — deterministic mock backend (no model required):
+./build/isky --backend mock --mock-script demo.json --task "create hello.txt and verify it"
+# …or against the real model:
+./build/isky --backend k3 --task "inspect this project and fix the build"
+```
+
+**What it does:** plans &rarr; selects a tool &rarr; executes &rarr; observes &rarr;
+(bounded) reflects &rarr; verifies &rarr; recovers on failure &rarr; final answer. A
+strict JSON action protocol means malformed model output is repaired or rejected, never
+executed. A workspace sandbox, per-tool permission levels, approval modes, and a shell
+allow/denylist keep risky actions gated. Full design in
+[`docs/agent/`](docs/agent/): [architecture](docs/agent/architecture.md) ·
+[agent loop](docs/agent/agent-loop.md) · [tools](docs/agent/tools.md) ·
+[memory](docs/agent/memory.md) · [security](docs/agent/security.md) ·
+[configuration](docs/agent/configuration.md) · [API](docs/agent/api.md) ·
+[examples](docs/agent/examples.md).
+
+> **isky runs on the Kimi K3 CPU inference engine**, which is vendored in this repo and
+> documented in full below. isky is a strictly additive layer: the engine, its CLI, and
+> its tests are unchanged. Everything from here down is the engine underneath.
+
+---
+
+<div align="center">
+
+<h2>The engine underneath: Kimi K3</h2>
 
 <h3>A 2.78-trillion-parameter model. One CPU. 8 GB of RAM.</h3>
 
 <p>Kimi K3 inference in portable C99.<br>No BLAS. No framework. No GPU.</p>
 
 <p>
-<a href="https://github.com/FareedKhan-dev/kimi-k3-in-c/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/FareedKhan-dev/kimi-k3-in-c/ci.yml?branch=main&style=flat-square&label=CI" alt="CI"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue?style=flat-square" alt="License"></a>
 <a href="Makefile"><img src="https://img.shields.io/badge/C99-portable-lightgrey?style=flat-square" alt="C99"></a>
 <a href="#requirements"><img src="https://img.shields.io/badge/platform-Linux%20x86--64-lightgrey?style=flat-square" alt="Platform"></a>
-<a href="CHANGELOG.md"><img src="https://img.shields.io/badge/version-1.0.0-brightgreen?style=flat-square" alt="Version"></a>
 </p>
 
 <table>
@@ -192,28 +255,28 @@ component at a time.
 
 ---
 
-# Autonomous agent layer (`k3-agent`)
+# Autonomous agent layer (isky)
 
-This repository also ships an **autonomous agent runtime** built *on top of* the
-inference engine, under [`agent/`](agent/). The engine remains the reasoning
-backend, unchanged; the agent adds goal decomposition, planning, a validated tool
-protocol (filesystem, shell, code, git, web), short/episodic/semantic/procedural
-memory in SQLite, a security sandbox with permission levels and approval modes,
+**isky** is the autonomous agent runtime that headlines this project (see the top of this
+README). It is built *on top of* the inference engine, under [`agent/`](agent/). The
+engine remains the reasoning backend, unchanged; isky adds goal decomposition, planning, a
+validated tool protocol (filesystem, shell, code, git, web), short/episodic/semantic/
+procedural memory in SQLite, a security sandbox with permission levels and approval modes,
 verification, error recovery, task persistence with resume, an interactive and
 non-interactive CLI, and an optional local HTTP API.
 
 It is strictly additive — the existing `k3` engine, CLI, and tests are untouched.
-Both build systems still work; the agent builds via CMake:
+Both build systems still work; isky builds via CMake:
 
 ```bash
 cmake -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j            # builds k3 (engine), k3-agent, and the test suite
+cmake --build build -j            # builds k3 (engine), isky (agent), and the test suite
 ctest --test-dir build            # engine gates + agent suite, no model weights needed
 
 # deterministic demo with the mock backend (no model required):
-./build/k3-agent --backend mock --mock-script demo.json --task "create hello.txt"
+./build/isky --backend mock --mock-script demo.json --task "create hello.txt"
 # with the real engine:
-./build/k3-agent --backend k3 --task "inspect this project and fix the build"
+./build/isky --backend k3 --task "inspect this project and fix the build"
 ```
 
 The full design and usage is documented under [`docs/agent/`](docs/agent/):
