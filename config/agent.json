@@ -1,0 +1,42 @@
+{
+  "model": {
+    "backend": "k3",
+    "model_dir": "./model",
+    "tok_dir": "",
+    "trunk_dir": "",
+    "trunk_gb": 0,
+    "cache_gb": 0.5,
+    "layers": 0,
+    "max_tokens": 1024,
+    "temperature": 0.2,
+    "top_p": 0.95
+  },
+  "agent": {
+    "max_iterations": 30,
+    "max_retries": 3,
+    "max_reflections": 2,
+    "max_repair_attempts": 5,
+    "autonomy_level": 3
+  },
+  "memory": {
+    "enabled": true,
+    "database": "agent.db"
+  },
+  "security": {
+    "sandbox": true,
+    "workspace": "./workspace",
+    "confirm_dangerous_tools": true,
+    "approval": "risky"
+  },
+  "prompts": {
+    "system": "agent/prompts/system.txt"
+  },
+  "logging": {
+    "level": "INFO",
+    "file": ""
+  },
+  "api": {
+    "enabled": false,
+    "port": 8080
+  }
+}

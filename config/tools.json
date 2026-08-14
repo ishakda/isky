@@ -1,0 +1,14 @@
+{
+  "_comment": "Tool metadata reference. The built-in tool set is registered in code; this file documents intrinsic security levels and is a place to tune per-tool defaults.",
+  "tools": [
+    { "name": "read_file",      "security_level": "SAFE" },
+    { "name": "list_directory", "security_level": "SAFE" },
+    { "name": "search_files",   "security_level": "SAFE" },
+    { "name": "write_file",     "security_level": "LOW_RISK" },
+    { "name": "edit_file",      "security_level": "LOW_RISK" },
+    { "name": "shell_execute",  "security_level": "MEDIUM_RISK" },
+    { "name": "delete_file",    "security_level": "HIGH_RISK" },
+    { "name": "git_commit",     "security_level": "LOW_RISK" },
+    { "name": "web_fetch",      "security_level": "MEDIUM_RISK" }
+  ]
+}

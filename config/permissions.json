@@ -1,0 +1,20 @@
+{
+  "approval": "risky",
+  "autonomy_level": 3,
+  "tools": {
+    "read_file":      { "enabled": true,  "require_confirmation": false },
+    "list_directory": { "enabled": true,  "require_confirmation": false },
+    "search_files":   { "enabled": true,  "require_confirmation": false },
+    "write_file":     { "enabled": true,  "require_confirmation": false },
+    "edit_file":      { "enabled": true,  "require_confirmation": false },
+    "shell_execute":  { "enabled": true,  "require_confirmation": true },
+    "delete_file":    { "enabled": true,  "require_confirmation": true },
+    "git_status":     { "enabled": true,  "require_confirmation": false },
+    "git_diff":       { "enabled": true,  "require_confirmation": false },
+    "git_log":        { "enabled": true,  "require_confirmation": false },
+    "git_branch":     { "enabled": true,  "require_confirmation": false },
+    "git_commit":     { "enabled": true,  "require_confirmation": true },
+    "web_fetch":      { "enabled": true,  "require_confirmation": true },
+    "web_search":     { "enabled": true,  "require_confirmation": false }
+  }
+}
